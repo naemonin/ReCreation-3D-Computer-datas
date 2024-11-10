@@ -1,0 +1,102 @@
+import bpy
+import math
+
+# Delete all existing objects
+bpy.ops.object.select_all(action='DESELECT')
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete()
+
+# Function to insert keyframes for an object with rotation but extended time duration
+def animate_object(obj, start_frame, end_frame, initial_rotation, final_rotation):
+    # Set initial transformation
+    obj.rotation_euler = initial_rotation
+
+    # Insert keyframe for initial state
+    obj.keyframe_insert(data_path="rotation_euler", frame=start_frame)
+
+    # Set final transformation
+    obj.rotation_euler = final_rotation
+
+    # Insert keyframe for final state
+    obj.keyframe_insert(data_path="rotation_euler", frame=end_frame)
+
+# Create a torus (ring)
+bpy.ops.mesh.primitive_torus_add(
+    major_radius=1,  # Half of the x dimension (2.05m / 2)
+    minor_radius=0.04,  # Half of the z dimension (0.0565m / 2)
+    location=(0, 0, 0)
+)
+
+# Get the current object (Torus)
+ring = bpy.context.object
+
+# Create a cylinder
+bpy.ops.mesh.primitive_cylinder_add(
+    radius=0.04,  # Radius for the x and y dimensions
+    depth=2,  # Depth for the z dimension
+    location=(0, 0, 0)
+)
+
+# Get the current object (Cylinder)
+cylinder = bpy.context.object
+
+# Initialize variables
+base_duration = 360  # Start with 360 frames for the first cycle
+hour = 1  # Start with the first hour
+
+# Infinite animation loop
+while True:
+    # Print the current hour (cycle number)
+    print(f"Cycle {hour} starting")
+
+    # Calculate the duration for the current cycle (relative to frame 0)
+    duration = base_duration * hour
+
+    # Set the start and end frames for this cycle
+    start_frame = 0
+    end_frame = duration
+
+    # Rotation angles for the torus (same for each hour, but longer cycles)
+    initial_rotation = (0, 0, 0)
+    final_rotation = (
+        math.radians(360),  # Rotation around X axis
+        math.radians(720),  # Rotation around Y axis
+        math.radians(1080)  # Rotation around Z axis
+    )
+
+    # Animate the torus (ring) with increasing duration for each cycle
+    animate_object(
+        ring,
+        start_frame=start_frame,
+        end_frame=end_frame,
+        initial_rotation=initial_rotation,
+        final_rotation=final_rotation
+    )
+
+    # Rotation angles for the cylinder (same for each cycle)
+    cylinder_initial_rotation = (0, 0, 0)
+    cylinder_final_rotation = (
+        math.radians(540),  # Rotation around X axis
+        math.radians(2160),  # Rotation around Y axis
+        math.radians(3240)  # Rotation around Z axis
+    )
+
+    # Animate the cylinder with different fixed rotation values
+    animate_object(
+        cylinder,
+        start_frame=start_frame,
+        end_frame=end_frame,
+        initial_rotation=cylinder_initial_rotation,
+        final_rotation=cylinder_final_rotation
+    )
+
+    # Print cycle details for debugging
+    print(f"Cycle {hour}: Animated from frame 0 to {end_frame}.")
+
+    # Increment the hour to extend the duration in the next cycle
+    hour += 1
+
+    # Optional: Limit the animation cycles to prevent an infinite loop in testing
+    if hour > : ? # For example, stop after ?  hours/cycles
+        print("Reached maximum hour limit, stopping.")
+        break
